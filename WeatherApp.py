@@ -1,12 +1,9 @@
 import tkinter as tk
 from tkinter import font
-import requests #api reqs
+import os
+# in BASH - 'py -m pip install requests --user' - api fetch service
+import requests 
 
-HEIGHT = 700
-WIDTH = 800
-KEY = '29a969b2a16a32f479de15ffa59a5bd1'
-URL_FORE = 'api.openweathermap.org/data/2.5/forecast'
-URL_CURR = 'api.openweathermap.org/data/2.5/weather'
 
 # functions
 def formatResponse(weather):
@@ -14,46 +11,54 @@ def formatResponse(weather):
         city = weather['name']
         desc = ['weather'][0]['description']
         temp = weather['main']['temp']
-
-        formatted_data = 'City: %s \nConditions: %s \nTemperature: %s F' % (city, desc, temp)
+        print(city, weather['name'])
+        formatted_data = city
 
     except:
         formatted_data = 'There was a problem retrieving the data.'
 
+    print(formatted_data)
+    return formatted_data
+
 def getWeather(city):
+    KEY = '29a969b2a16a32f479de15ffa59a5bd1'
+    URL_FORE = 'https://api.openweathermap.org/data/2.5/forecast'
+    URL_CURR = 'https://api.openweathermap.org/data/2.5/weather'
+
     params = {'APPID': KEY, 'q': city, 'units': 'imperial'}
-    res = requests.get(URL_FORE, params=params)
+    res = requests.get(URL_CURR, params=params)
     data = res.json() #json converts to python dict
     
-    label[text] = formatResponse(data)
+    label['text'] = formatResponse(data)
 
-# set background image
-bk_img = tk.PhotoImage(file='island.jpg')
-bk_label = tk.Label(root, image=bk_img)
-bk_label.place(relwidth=1, relheight=1)
 
-#every app built with tk needs a root to attach to
-root = tk.TK()
 
-#create container with defined size for button
-canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH)
+
+root = tk.Tk()
+
+#create container with defined size for input and button 
+canvas = tk.Canvas(root, height=500, width=600, bg='pink')
 canvas.pack()
 
-frame = tk.Frame(root, bg='#efefef', bd=3)
-frame.place(anchor="n", relwidth=.75, relheight=0.1, relx=0.5, rely=0.5) 
+# set background image
+# background_image = tk.PhotoImage(file='island.png')
+# background_label = tk.Label(root, image=background_image)
+# background_label.place(relwidth=1, relheight=1)
 
-entry = tk.Entry(frame, bg='yellow', font=('Modern', 12))
-entry.pack(relwidth=0.65, relheight=0.75)
+frame = tk.Frame(root)
+frame.place(anchor="n", relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1) 
 
-button = tk.Button(root, text="Weather", bg='#cce6ff', font=('Modern', 12), command=Lambda:getWeather(entry.get()) )
-#Lambda = reruns it each time the button is hit. Async function
-button.pack(relx=0.7, relwidth=0.3, relheight=0.75) 
+entry = tk.Entry(frame, bg='white', font=('Modern', 12))
+entry.place(relwidth=0.75, relheight=1, )
 
-lower_frame = tk.Frame(root, bg='#efefef' bd=3)
+button = tk.Button(frame, text="Get Weather", bg='white', font=('Modern', 12), command=lambda:getWeather(entry.get()) )
+button.place(relx=0.75, relheight=1, relwidth=0.25) 
+
+lower_frame = tk.Frame(root, bg='white', bd=3)
 lower_frame.place(anchor='n', relx=0.5, rely=0.25, relwidth=0.75, relheight=0.6)
 
-label = tk.Label(lower_frame, font=('Modern', 30), )
-label.pack(relwidth=1, relheight=1)
+label = tk.Label(lower_frame, font=('Modern', 25) )
+label.place(relwidth=1, relheight=1)
 
 #always last line
 root.mainloop()
